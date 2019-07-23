@@ -1,0 +1,4 @@
+[submodule "deps/DaemonFramework"]
+	path = deps/DaemonFramework
+	url = https://github.com/centuryglass/DaemonFramework
+	branch = master
