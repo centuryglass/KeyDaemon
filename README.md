@@ -1,5 +1,5 @@
 # KeyDaemon
-  KeyDaemon is a Linux setuid helper program that can globally monitor keyboard events, so that the application it supports can detect keyboard input even if another window is focused. This is intended to simplify the process of adding global hotkeys/controls to any application, without relying on any specific desktop environment or even the X window server.
+  KeyDaemon is a privileged Linux helper program that can globally monitor keyboard events, so that the application it supports can detect keyboard input even if another window is focused. This is intended to simplify the process of adding global hotkeys/controls to any application, without relying on any specific desktop environment or even the X window server.
 
 ### Transmitting key event codes
  KeyDaemon communicates with its parent application using a named pipe file that can only be read by the parent application's owner, and can only be written to by KeyDaemon or root. The parent application should use the KeyDaemonControl and PipeReader::Listener classes provided in the Include directory to control the daemon and handle received key codes.
