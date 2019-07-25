@@ -1,1 +1,7 @@
+buildAll.sh
 build/
+Tests/exec/
+Tests/supportModules/__pycache__/
+Tests/testModules/__pycache__/
+Tests/tempLog.txt
+Tests/failureLog.txt
