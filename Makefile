@@ -23,23 +23,14 @@ define KD_HELPTEXT
 endef
 export HELPTEXT
 
+
+###################### Initialize project variables: ##########################
 # Build type: either Debug or Release
 KD_CONFIG?=Release
 # Enable or disable verbose output
 KD_VERBOSE?=0
 V_AT:=$(shell if [ $(KD_VERBOSE) != 1 ]; then echo '@'; fi)
 
-######################### Primary Build Target: ###############################
-$(KD_TARGET_APP): build
-	@echo Linking "$(KD_TARGET_APP):"
-	@if [ "$(KD_VERBOSE)" == "1" ]; then \
-        $(DAEMON_FRAMEWORK_DIR)/cleanPrint.sh '$(CXX) $(LINK_ARGS)'; \
-        echo ''; \
-    fi
-	@$(CXX) $(LINK_ARGS)
-
-
-###################### Initialize project variables: ##########################
 # Project directories:
 PROJECT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 SOURCE_DIR:=$(PROJECT_DIR)/Source
@@ -49,8 +40,8 @@ OBJDIR:=$(KD_BUILD_DIR)/Intermediate
 DAEMON_FRAMEWORK_DIR:=$(PROJECT_DIR)/deps/DaemonFramework
 
 # Target paths:
-BUILD_PATH:=$(KD_BUILD_DIR)/$(KD_TARGET_APP)
-INSTALL_PATH:=$(KD_INSTALL_DIR)/$(KD_TARGET_APP)
+KD_TARGET_PATH:=$(KD_BUILD_DIR)/$(KD_TARGET_APP)
+KD_INSTALL_PATH:=$(KD_INSTALL_DIR)/$(KD_TARGET_APP)
 
 # Command used to strip unneeded symbols from object files:
 KD_STRIP?=strip
@@ -59,13 +50,22 @@ KD_STRIP?=strip
 KD_TARGET_ARCH?=-march=native
 
 # Command used to clean out build files:
-CLEANCMD = rm -rf $(BUILD_PATH) $(OBJDIR)
+CLEANCMD = rm -rf $(KD_TARGET_PATH) $(OBJDIR)
+
+######################### Primary Build Target: ###############################
+$(KD_TARGET_PATH): build
+	@echo Linking "$(KD_TARGET_APP):"
+	@if [ "$(KD_VERBOSE)" == "1" ]; then \
+        $(DAEMON_FRAMEWORK_DIR)/cleanPrint.sh '$(CXX) $(LINK_ARGS)'; \
+        echo ''; \
+    fi
+	@$(CXX) $(LINK_ARGS)
 
 ################ Configure and include framework makefile: ####################
 DF_OBJDIR:=$(OBJDIR)
 DF_CONFIG:=$(KD_CONFIG)
 DF_VERBOSE:=$(KD_VERBOSE)
-DF_DAEMON_PATH:=$(INSTALL_PATH)
+DF_DAEMON_PATH:=$(KD_INSTALL_PATH)
 DF_REQUIRED_PARENT_PATH:=$(KD_PARENT_PATH)
 DF_OUTPUT_PIPE_PATH:=$(KD_PIPE_PATH)
 DF_LOCK_FILE_PATH:=$(KD_LOCK_PATH)
@@ -144,10 +144,10 @@ OBJECTS:=$(OBJDIR)/Main.o \
 BUILD_FLAGS:=$(CFLAGS) $(CXXFLAGS) $(CPPFLAGS)
 
 # Complete set of arguments used to link the program:
-LINK_ARGS:=-o $(BUILD_PATH) $(OBJECTS) $(DF_OBJECTS_DAEMON) $(LDFLAGS)
+LINK_ARGS:=-o $(KD_TARGET_PATH) $(OBJECTS) $(DF_OBJECTS_DAEMON) $(LDFLAGS)
 
 ###################### Supporting Build Targets: ##############################
-.PHONY: check_defs install clean strip uninstall help
+.PHONY: build check_defs install clean strip uninstall help
 
 $(OBJECTS) :
 	@echo "Compiling $(<F):"
@@ -179,8 +179,8 @@ check_defs:
 
 install: check_defs
 	$(V_AT)sudo mkdir -p $(KD_INSTALL_DIR); \
-	sudo cp $(BUILD_PATH) $(INSTALL_PATH); \
-    sudo setcap -q cap_dac_override=ep $(INSTALL_PATH);
+	sudo cp $(KD_TARGET_PATH) $(KD_INSTALL_PATH); \
+    sudo setcap -q cap_dac_override=ep $(KD_INSTALL_PATH);
 
 clean: check_defs
 	@echo "Cleaning $(KD_TARGET_APP)"
@@ -188,12 +188,12 @@ clean: check_defs
 
 strip: check_defs
 	@echo "Stripping $(KD_TARGET_APP)"
-	$(V_AT)$(KD_STRIP) --strip-unneeded $(INSTALL_PATH)
+	$(V_AT)$(KD_STRIP) --strip-unneeded $(KD_INSTALL_PATH)
 
 uninstall: check_defs
 	@echo echo "Uninstalling $(KD_TARGET_APP)"
-	$(V_AT)if [ -f "$(INSTALL_PATH)" ]; then \
-	    sudo rm "$(INSTALL_PATH)"; \
+	$(V_AT)if [ -f "$(KD_INSTALL_PATH)" ]; then \
+	    sudo rm "$(KD_INSTALL_PATH)"; \
     fi
 
 help:
