@@ -14,6 +14,7 @@ define KD_HELPTEXT
 #
 # 2. Optionally, provide valid definitions for these additional variables to
 #    enable features or override default values:
+#    - DAEMON_FRAMEWORK_DIR
 #    - KD_CONFIG
 #    - KD_VERBOSE
 #    - KD_STRIP
@@ -37,7 +38,7 @@ SOURCE_DIR:=$(PROJECT_DIR)/Source
 INCLUDE_DIR:=$(PROJECT_DIR)/Include
 KD_BUILD_DIR?=$(PROJECT_DIR)/build/$(KD_CONFIG)
 OBJDIR:=$(KD_BUILD_DIR)/intermediate
-DAEMON_FRAMEWORK_DIR:=$(PROJECT_DIR)/deps/DaemonFramework
+DAEMON_FRAMEWORK_DIR?=$(PROJECT_DIR)/deps/DaemonFramework
 
 # Target paths:
 KD_TARGET_PATH:=$(KD_BUILD_DIR)/$(KD_TARGET_APP)

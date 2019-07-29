@@ -13,6 +13,7 @@ define KD_HELPTEXT
 #
 # 2. Optionally, provide valid definitions for these additional variables to
 #    enable features or override default values:
+#    - DAEMON_FRAMEWORK_DIR
 #    - KD_CONFIG
 #    - KD_VERBOSE
 #    - KD_OPTIMIZATION
@@ -51,7 +52,7 @@ KD_V_AT:=$(shell if [ $(KD_VERBOSE) != 1 ]; then echo '@'; fi)
 KD_TARGET_ARCH?=-march=native
 
 ################ Configure and include framework makefile: ####################
-DAEMON_FRAMEWORK_DIR:=$(KD_PROJECT_DIR)/deps/DaemonFramework
+DAEMON_FRAMEWORK_DIR?=$(KD_PROJECT_DIR)/deps/DaemonFramework
 DF_CONFIG:=$(KD_CONFIG)
 DF_VERBOSE:=$(KD_VERBOSE)
 DF_OBJDIR:=$(KD_OBJDIR)
