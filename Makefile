@@ -36,7 +36,7 @@ PROJECT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 SOURCE_DIR:=$(PROJECT_DIR)/Source
 INCLUDE_DIR:=$(PROJECT_DIR)/Include
 KD_BUILD_DIR?=$(PROJECT_DIR)/build/$(KD_CONFIG)
-OBJDIR:=$(KD_BUILD_DIR)/Intermediate
+OBJDIR:=$(KD_BUILD_DIR)/intermediate
 DAEMON_FRAMEWORK_DIR:=$(PROJECT_DIR)/deps/DaemonFramework
 
 # Target paths:
