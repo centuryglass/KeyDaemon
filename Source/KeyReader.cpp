@@ -80,10 +80,6 @@ void KeyDaemon::KeyReader::processInput(const int inputBytes)
                     || eventBuffer[i].value 
                     >= (int) EventType::trackedTypeCount)
             {
-                DBG_V(messagePrefix << __func__ << ": Event " << i
-                        << ": Ignoring irrelevant event with type "
-                        << eventBuffer[i].type << ", value " 
-                        << eventBuffer[i].value);
                 continue;
             }
             if (std::binary_search(trackedCodes.begin(), trackedCodes.end(),
