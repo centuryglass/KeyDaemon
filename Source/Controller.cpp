@@ -9,7 +9,8 @@ static const constexpr char* messagePrefix = "KeyDaemon::Controller::";
 
 // Configures the daemon output pipe on construction.
 KeyDaemon::Controller::Controller() :
-DaemonFramework::DaemonControl(sizeof(KeyMessage)) { }
+DaemonFramework::DaemonControl(KD_DAEMON_PATH, "", KD_PIPE_PATH,
+        sizeof(KeyMessage)) { }
 
 
 // Launches the KeyDaemon if it isn't already running.
@@ -24,7 +25,7 @@ void KeyDaemon::Controller::startKeyDaemon
     {
         codeArguments.push_back(std::to_string(code));
     }
-    startDaemon(this, codeArguments);
+    startDaemon(codeArguments, this);
     DBG_V(messagePrefix << __func__ << ": Launching daemon with "
             << codeArguments.size() << " tracked code arguments.");
     keyCodes = trackedKeyCodes;

@@ -57,9 +57,6 @@ DF_CONFIG:=$(KD_CONFIG)
 DF_VERBOSE:=$(KD_VERBOSE)
 DF_OBJDIR:=$(KD_OBJDIR)
 DF_TARGET_ARCH:=$(KD_TARGET_ARCH)
-DF_DAEMON_PATH:=$(KD_DAEMON_PATH)
-DF_REQUIRED_PARENT_PATH:=$(KD_PARENT_PATH)
-DF_OUTPUT_PIPE_PATH:=$(KD_PIPE_PATH)
 
 include $(DAEMON_FRAMEWORK_DIR)/Parent.mk
 
@@ -107,6 +104,8 @@ KD_DEPFLAGS:=$(if $(word 2, $(DF_TARGET_ARCH)), , -MMD)
 
 KD_DEFINE_FLAGS:=$(call addDef,KD_KEY_LIMIT) \
                  $(call addDef,KD_VERBOSE) \
+                 $(call addStringDef,KD_DAEMON_PATH) \
+                 $(call addStringDef,KD_PIPE_PATH) \
                  $(DF_DEFINE_FLAGS)
 
 KD_CPPFLAGS:=-pthread \

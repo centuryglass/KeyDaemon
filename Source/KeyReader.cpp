@@ -39,7 +39,7 @@ KeyDaemon::KeyReader::KeyReader(const char* eventFilePath,
 int KeyDaemon::KeyReader::openFile()
 {
     errno = 0;
-    int keyEventFileDescriptor = open(getPath(), O_RDONLY);
+    int keyEventFileDescriptor = open(getPath().c_str(), O_RDONLY);
     if (errno != 0)
     {
         DBG(messagePrefix << __func__ 
