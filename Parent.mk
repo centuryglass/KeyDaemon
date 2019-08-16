@@ -57,8 +57,14 @@ DF_CONFIG:=$(KD_CONFIG)
 DF_VERBOSE:=$(KD_VERBOSE)
 DF_OBJDIR:=$(KD_OBJDIR)
 DF_TARGET_ARCH:=$(KD_TARGET_ARCH)
+DF_PARENT_MAKEFILE:=$(DAEMON_FRAMEWORK_DIR)/Parent.mk
 
-include $(DAEMON_FRAMEWORK_DIR)/Parent.mk
+# Include the daemon parent makefile only if it hasn't already been included:
+ifeq (,$(findstring $(DF_PARENT_MAKEFILE),$(MAKEFILE_LIST)))
+    include $(DAEMON_FRAMEWORK_DIR)/Parent.mk
+else
+    KD_DF_PARENT_ALREADY_INCLUDED=1
+endif
 
 ############################### Set build flags: ##############################
 #### Config-specific flags: ####
@@ -96,8 +102,7 @@ KD_CXXFLAGS:=-std=gnu++14 $(CXXFLAGS)
 
 # Include directories:
 KD_INCLUDE_FLAGS:=$(call recursiveInclude,$(KD_INCLUDE_DIR)/Parent) \
-                  $(call recursiveInclude,$(KD_INCLUDE_DIR)/Shared) \
-                  $(DF_INCLUDE_FLAGS)
+                  $(call recursiveInclude,$(KD_INCLUDE_DIR)/Shared)
 
 # Disable dependency generation if multiple architectures are set
 KD_DEPFLAGS:=$(if $(word 2, $(DF_TARGET_ARCH)), , -MMD)
@@ -105,28 +110,41 @@ KD_DEPFLAGS:=$(if $(word 2, $(DF_TARGET_ARCH)), , -MMD)
 KD_DEFINE_FLAGS:=$(call addDef,KD_KEY_LIMIT) \
                  $(call addDef,KD_VERBOSE) \
                  $(call addStringDef,KD_DAEMON_PATH) \
-                 $(call addStringDef,KD_PIPE_PATH) \
-                 $(DF_DEFINE_FLAGS)
+                 $(call addStringDef,KD_PIPE_PATH)
 
 KD_CPPFLAGS:=-pthread \
              $(KD_DEPFLAGS) \
              $(KD_CONFIG_FLAGS) \
              $(KD_DEFINE_FLAGS) \
+             $(DF_DEFINE_FLAGS) \
              $(KD_INCLUDE_FLAGS) \
+             $(DF_INCLUDE_FLAGS) \
              $(KD_CPPFLAGS)
 
 KD_OBJECTS:=$(KD_OBJDIR)/Controller.o $(KD_OBJDIR)/EventType.o
 
-KD_OBJECTS_PARENT:=$(KD_OBJECTS) $(DF_OBJECTS_PARENT)
+KD_PARENT_DEPS:=kd-check-defs $(KD_OBJECTS)
+
+KD_OBJECTS_PARENT:=$(KD_OBJECTS)
+# If the DaemonFramework's Parent.mk file was included before this makefile,
+# assume that building DaemonFramework content has been taken care of already.
+# Otherwise, add DaemonFramework targets and flags:
+ifneq ($(KD_DF_PARENT_ALREADY_INCLUDED),1)
+    KD_OBJECTS_PARENT+= $(DF_OBJECTS_PARENT)
+    KD_INCLUDE_FLAGS+= $(DF_INCLUDE_FLAGS)
+    KD_DEFINE_FLAGS+= $(DF_DEFINE_FLAGS)
+    KD_PARENT_DEPS:=df-parent $(KD_PARENT_DEPS)
+endif
 
 KD_BUILD_FLAGS:=$(KD_CFLAGS) $(KD_CXXFLAGS) $(KD_CPPFLAGS)
 
-###################### Supporting Build Targets: ##############################
+############################# Build Targets: ###################################
 
 .PHONY: kd-parent kd-check-defs kd-clean
 
+
 ## Main build target: ##
-kd-parent : kd-check-defs df-parent $(KD_OBJECTS)
+kd-parent : $(KD_PARENT_DEPS)
 
 
 kd_check_defs:
